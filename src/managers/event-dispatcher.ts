@@ -3,8 +3,10 @@ import { HeliosEvent } from "../events/base/HeliosEvent";
 
 class EventDispatcher extends EventEmitter {
 	dispatchEvent(event: HeliosEvent): void {
-		const eventName = event.getEventName();
-		super.emit(eventName);
+		try {
+			const eventName = event.getEventName();
+			super.emit(event.eventType);
+		} catch (error) {}
 	}
 }
 
