@@ -1,5 +1,5 @@
 import { HeliosEvent } from "../events/base/HeliosEvent";
-import EventDispatcher from "./EventDispatcher";
+import EventDispatcher from "../event-dispatcher/event-dispatcher";
 
 class NotificationDispatcher {
 	constructor(private eventDispatcher: EventDispatcher) {
@@ -8,17 +8,13 @@ class NotificationDispatcher {
 	}
 
 	subscribe() {
-		this.eventDispatcher.on("user_registered", this.handleGameEvent);
-		this.eventDispatcher.on("order_completed", this.handleSocialEvent);
+		this.eventDispatcher.on(HeliosEvent.EVENT_TYPE, this.handleGameEvent);
 	}
 
 	handleGameEvent(event: HeliosEvent) {
 		console.log("Game event received:", event);
 	}
 
-	handleSocialEvent(event: HeliosEvent) {
-		console.log("Social event received:", event);
-	}
 }
 
 export default NotificationDispatcher;
