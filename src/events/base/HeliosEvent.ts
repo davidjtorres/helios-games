@@ -1,21 +1,66 @@
 /**
  * @description This is the base class for all events in the system
+ * @property {string} id - Unique identifier for the event
+ * @property {number} timestamp - When the event occurred
+ * @property {string} eventType - Type of event
+ * @property {string} source - Where the event originated from
+ * @property {Record<string, any>} metadata - Optional additional data
  */
-export class HeliosEvent {
-	static readonly EVENT_TYPE: string = "defaultEventType";
-	readonly eventType: string;
+export abstract class BaseEvent {
+	protected readonly id: string;           // Unique identifier for the event
+	protected readonly timestamp: number;    // When the event occurred
+	protected readonly eventType: string;    // Type of event
+	protected readonly source: string;       // Where the event originated from // Importance level of the event
+	protected metadata?: Record<string, any>; // Optional additional data
 
-	constructor(private eventName: string, private eventMessage: string) {
-		this.eventName = eventName;
-		this.eventMessage = eventMessage;
-		this.eventType = HeliosEvent.EVENT_TYPE;
+	constructor(
+		eventType: string,
+		source: string,
+		metadata?: Record<string, any>
+	) {
+		this.id = this.generateEventId();
+		this.timestamp = Date.now();
+		this.eventType = eventType;
+		this.source = source;
+		this.metadata = metadata;
 	}
 
-	getEventName(): string {
-		throw new Error("getMessage() must be implemented");
+	public getId(): string {
+		return this.id;
 	}
 
-	// method to serialize the event
+	public getTimestamp(): number {
+		return this.timestamp;
+	}
+
+	public getEventType(): string {
+		return this.eventType;
+	}
+
+	public getSource(): string {
+		return this.source;
+	}
+
+	public getMetadata(): Record<string, any> | undefined {
+		return this.metadata;
+	}
+
+
+	private generateEventId(): string {
+		return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+	}
+
+
+	public toJSON(): Record<string, any> {
+		return {
+			id: this.id,
+			timestamp: this.timestamp,
+			eventType: this.eventType,
+			source: this.source,
+			metadata: this.metadata
+		};
+	}
+
 	serialize(): string {
 		return JSON.stringify(this);
 	}
