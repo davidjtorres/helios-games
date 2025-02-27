@@ -1,4 +1,5 @@
-import { GameEvent, GameEventNameEnum } from "./base/game-event";
+import { GameEvent } from "./base/game-event";
+import { GameEventNameEnum } from "../../common/enums";
 
 export class PlayerCompleteAchievementEvent extends GameEvent {
     constructor(private readonly playerId: string, private readonly achievementId: string) {
