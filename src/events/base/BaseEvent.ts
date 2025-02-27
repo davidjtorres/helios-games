@@ -7,15 +7,15 @@
  * @property {Record<string, any>} metadata - Optional additional data
  */
 export abstract class BaseEvent {
-	protected readonly id: string;           // Unique identifier for the event
-	protected readonly timestamp: number;    // When the event occurred
-	protected readonly eventType: string;    // Type of event
-	protected readonly source: string;       // Where the event originated from // Importance level of the event
+	protected readonly id: string; // Unique identifier for the event
+	protected readonly timestamp: number; // When the event occurred
+	protected readonly eventType: string; // Type of event
+	protected readonly source: string; // Where the event originated from // Importance level of the event
 	protected metadata?: Record<string, any>; // Optional additional data
 
 	constructor(
 		eventType: string,
-		source: string,
+		source?: string,
 		metadata?: Record<string, any>
 	) {
 		this.id = this.generateEventId();
@@ -45,20 +45,15 @@ export abstract class BaseEvent {
 		return this.metadata;
 	}
 
-
 	private generateEventId(): string {
 		return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 	}
 
-
 	public toJSON(): Record<string, any> {
-		return {
-			id: this.id,
-			timestamp: this.timestamp,
-			eventType: this.eventType,
-			source: this.source,
-			metadata: this.metadata
-		};
+		return Object.getOwnPropertyNames(this).reduce((acc, prop) => {
+			acc[prop] = this[prop];
+			return acc;
+		}, {});
 	}
 
 	serialize(): string {
