@@ -1,11 +1,12 @@
 import { EventEmitter } from "events";
-import { HeliosEvent } from "../events/base/HeliosEvent";
 
+/**
+ * @description EventDispatcher is an emiiter that other classes use to dispatch and listen to events.
+ */
 class EventDispatcher extends EventEmitter {
-	dispatchEvent(event: HeliosEvent): void {
+	dispatchEvent(topic: string, data: { [key: string]: any }): void {
 		try {
-			const eventName = event.getEventName();
-			super.emit(event.eventType);
+			super.emit(topic, data);
 		} catch (error) {}
 	}
 }

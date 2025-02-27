@@ -1,5 +1,5 @@
 import EventDispatcher from "./event-dispatcher";
-import { HeliosEvent } from "../events/base/HeliosEvent";
+import { GameEvent } from "../events/game/base/game-event";
 
 describe("EventDispatcher", () => {
 	let eventDispatcher: EventDispatcher;
@@ -9,13 +9,11 @@ describe("EventDispatcher", () => {
 	});
 
 	it("should emit event with correct type", () => {
-		const event = new HeliosEvent(
-			"This is an event",
-			"This is the event message"
-		);
-		eventDispatcher.on(event.eventType, () => {
+		eventDispatcher.on(GameEvent.EVENT_TYPE, () => {
 			expect(true).toBe(true);
 		});
-		eventDispatcher.dispatchEvent(event);
+		eventDispatcher.dispatchEvent(GameEvent.EVENT_TYPE, {
+			message: "This is the game event message",
+		});
 	});
 });
