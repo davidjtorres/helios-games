@@ -1,65 +1,53 @@
+export interface UserNotificationPreferences {
+	events: {
+		gameEvent: boolean;
+		socialEvent: boolean;
+	};
+	channels: {
+		inApp: boolean;
+		email: boolean;
+		push: boolean;
+		telegram: boolean;
+	};
+}
+
 class StoreManager {
-	private store: Map<string, any>;
+	private store: Record<string, UserNotificationPreferences>;
 
 	constructor() {
-		this.store = new Map<string, any>([
-			[
-				"user_notification_preferences_1",
-				{
-					notificationPreferences: {
-						events: {
-							gameEvent: true,
-							socialEvent: true,
-						},
-						channels: {
-							email: false,
-							push: true,
-							telegram: true,
-						},
-					},
+		this.store = {
+			user_notification_preferences_1: {
+				events: {
+					gameEvent: true,
+					socialEvent: true,
 				},
-			],
-			[
-				"user_notification_preferences_2",
-				{
-					notificationPreferences: {
-						events: {
-							gameEvent: true,
-							socialEvent: true,
-						},
-						channels: {
-							email: true,
-							push: false,
-							telegram: false,
-						},
-					},
+				channels: {
+					inApp: true,
+					email: false,
+					push: true,
+					telegram: true,
 				},
-			],
-		]);
+			},
+		};
 	}
 
-	// Method to add an item to the store
 	addItem(key: string, value: any): void {
-		this.store.set(key, value);
+		this.store[key] = value;
 	}
 
-	// Method to retrieve an item from the store
-	getItem(key: string): any | undefined {
-		return this.store.get(key);
+	getItem(key: string): UserNotificationPreferences | undefined {
+		return this.store[key];
 	}
 
-	// Method to remove an item from the store
 	removeItem(key: string): boolean {
-		return this.store.delete(key);
+		return delete this.store[key];
 	}
 
-	// Method to clear the store
 	clearStore(): void {
-		this.store.clear();
+		this.store = {};
 	}
 
-	// Method to get all items in the store
-	getAllItems(): Map<string, any> {
+	getAllItems(): Record<string, UserNotificationPreferences> {
 		return this.store;
 	}
 }
