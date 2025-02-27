@@ -4,7 +4,7 @@ class StoreManager {
 	constructor() {
 		this.store = new Map<string, any>([
 			[
-				"1",
+				"user_notification_preferences_1",
 				{
 					notificationPreferences: {
 						events: {
@@ -20,7 +20,7 @@ class StoreManager {
 				},
 			],
 			[
-				"2",
+				"user_notification_preferences_2",
 				{
 					notificationPreferences: {
 						events: {
