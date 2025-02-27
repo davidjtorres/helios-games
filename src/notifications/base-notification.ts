@@ -2,7 +2,7 @@
  * @description This is the base class for all notifications in the system
  */
 
-class HeliosNotification {
+class BaseNotification {
 	payload: string;
 	read: boolean;
 	userId: string;
@@ -28,4 +28,4 @@ class HeliosNotification {
 	}
 }
 
-export default HeliosNotification;
+export default BaseNotification;
