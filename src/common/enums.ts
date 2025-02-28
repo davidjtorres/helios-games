@@ -17,3 +17,20 @@ export enum NotificationDispatcherEnum {
 	Email = "email-notification-dispatcher",
 	Push = "push-notification-dispatcher",
 }
+
+export enum EventTypeEnum {
+	Social = "social-event",
+	Game = "gamme-event",
+}
+
+export enum EventNameEnum {
+	FollowUser = "followUser",
+	UnfollowUser = "unfollowUser",
+	FriendRequest = "friendRequest",
+	FriendRequestAccepted = "friendRequestAccepted",
+	PlayerLevelUp = "playerLevelUp",
+	PlayerAcquireItem = "playerAcquireItem",
+	PlayerCompleteQuest = "playerCompleteQuest",
+	PlayerCompleteAchievement = "playerCompleteAchievement",
+	PlayerVsPlayer = "playerVsPlayer",
+}
