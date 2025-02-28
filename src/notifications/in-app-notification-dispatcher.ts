@@ -1,5 +1,6 @@
 import { NotificationDispatcherEnum } from "../common/enums";
 import EventDispatcher from "../event-dispatcher/event-dispatcher";
+import BaseNotification from "./base-notification";
 
 class InAppNotificationDispatcher {
 	constructor(private eventDispatcher: EventDispatcher) {
@@ -7,14 +8,18 @@ class InAppNotificationDispatcher {
 		this.subscribe();
 	}
 
-	subscribe() {
-		this.eventDispatcher.on(NotificationDispatcherEnum.InApp, this.handleEvent);
+	private subscribe() {
+		this.eventDispatcher.on(
+			NotificationDispatcherEnum.InApp,
+			this.handleEvent.bind(this)
+		);
 	}
 
-	handleEvent(event: Record<string, any>) {
-		console.log("Game event received:", event);
+	private handleEvent(notification: BaseNotification) {
+		console.log(
+			`Sending in app notification to user ${notification.userId}:: ${notification.payload}`
+		);
 	}
-
 }
 
 export default InAppNotificationDispatcher;
