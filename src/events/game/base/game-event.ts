@@ -1,11 +1,7 @@
-import { BaseEvent } from "../../base/BaseEvent";
-import { GameEventNameEnum } from "../../../common/enums";
+import { BaseEvent } from "../../base/base-event";
+import { EventTypeEnum } from "../../../common/enums";
 
 export class GameEvent extends BaseEvent {
-	static readonly EVENT_TYPE: string = "GameEvent";
-	readonly eventType: string = "GameEvent";
-
-	constructor(eventType: GameEventNameEnum) {
-		super(eventType);
-	}
+	static readonly EVENT_TYPE: string = EventTypeEnum.Game;
+	readonly eventType: string = EventTypeEnum.Game;
 }

@@ -1,11 +1,9 @@
-import EventDispatcher from "../../../event-dispatcher/event-dispatcher";
 
-class SocialEvent {
-	static readonly EVENT_TYPE: string = "SocialEvent";
-	readonly eventType: string = "SocialEvent";
-	constructor(private eventDispatcher: EventDispatcher) {
-		this.eventDispatcher = eventDispatcher;
-	}
+import { BaseEvent } from "../../base/base-event";
+import { EventTypeEnum } from "../../../common/enums";
+class SocialEvent extends BaseEvent {
+	static readonly EVENT_TYPE: string = EventTypeEnum.Social;
+	readonly eventType: string = EventTypeEnum.Social;
 }
 
 export default SocialEvent;
