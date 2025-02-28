@@ -3,13 +3,13 @@ export enum GameEventNameEnum {
 	PlayerAcquireItem = "playerAcquireItem",
 	PlayerCompleteQuest = "playerCompleteQuest",
 	PlayerCompleteAchievement = "playerCompleteAchievement",
-	PlayerVsPlayer = "playerVsPlayer",
 }
 
 export enum NotificationTypeEnum {
 	Email = "email",
 	Push = "push",
 	Web = "web",
+	InApp = "in-app",
 }
 
 export enum NotificationDispatcherEnum {
