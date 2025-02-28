@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "npx tsx index.ts",
-    "dev": "npx tsx index.ts",
-    "build": "tsc",
-    "serve": "node dist/index.js",
-    "test": "jest",
-    "test:watch": "jest --watch"
+		"start": "npx tsx index.ts",
+		"dev": "npx tsx index.ts",
+		"build": "tsc",
+		"serve": "node dist/index.js",
+		"test": "jest",
+		"test:watch": "jest --watch"
   },
   "keywords": [],
   "author": "",
