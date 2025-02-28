@@ -20,7 +20,7 @@ export enum NotificationDispatcherEnum {
 
 export enum EventTypeEnum {
 	Social = "social-event",
-	Game = "gamme-event",
+	Game = "game-event",
 }
 
 export enum EventNameEnum {
