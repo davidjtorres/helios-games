@@ -1,20 +1,20 @@
-import { HeliosEvent } from "../events/base/HeliosEvent";
+import { NotificationDispatcherEnum } from "../common/enums";
 import EventDispatcher from "../event-dispatcher/event-dispatcher";
 
-class NotificationDispatcher {
+class InAppNotificationDispatcher {
 	constructor(private eventDispatcher: EventDispatcher) {
 		this.eventDispatcher = eventDispatcher;
 		this.subscribe();
 	}
 
 	subscribe() {
-		this.eventDispatcher.on(HeliosEvent.EVENT_TYPE, this.handleGameEvent);
+		this.eventDispatcher.on(NotificationDispatcherEnum.InApp, this.handleEvent);
 	}
 
-	handleGameEvent(event: HeliosEvent) {
+	handleEvent(event: Record<string, any>) {
 		console.log("Game event received:", event);
 	}
 
 }
 
-export default NotificationDispatcher;
+export default InAppNotificationDispatcher;
