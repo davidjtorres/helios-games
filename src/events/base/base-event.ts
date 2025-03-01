@@ -10,18 +10,18 @@ export abstract class BaseEvent {
 	protected readonly id: string; // Unique identifier for the event
 	protected readonly timestamp: number; // When the event occurred
 	protected readonly eventType: string; // Type of event
-	protected readonly source: string; // Where the event originated from // Importance level of the event
+	protected readonly eventName: string; // Name of the event
 	protected metadata?: Record<string, any>; // Optional additional data
 
 	constructor(
 		eventType: string,
-		source?: string,
+		eventName: string,
 		metadata?: Record<string, any>
 	) {
 		this.id = this.generateEventId();
 		this.timestamp = Date.now();
 		this.eventType = eventType;
-		this.source = source;
+		this.eventName = eventName;
 		this.metadata = metadata;
 	}
 
@@ -37,8 +37,8 @@ export abstract class BaseEvent {
 		return this.eventType;
 	}
 
-	public getSource(): string {
-		return this.source;
+	public getEventName(): string {
+		return this.eventName;
 	}
 
 	public getMetadata(): Record<string, any> | undefined {
