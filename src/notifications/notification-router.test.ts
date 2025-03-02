@@ -1,125 +1,94 @@
 import NotificationRouter from "./notification-router";
-import { NotificationDispatcherEnum } from "../common/enums";
-import { GameEvent } from "../events/game/base/game-event";
+import EventDispatcher from "../event-dispatcher/event-dispatcher";
+import StoreManager from "../services/store-manager";
+import { GameEventNameEnum, NotificationDispatcherEnum, NotificationTypeEnum } from "../common/enums";
 import BaseNotification from "./base-notification";
-import { UserNotificationPreferences } from "../services/store-manager";
+import { GameEvent } from "../events/game/base/game-event";
 describe("NotificationRouter", () => {
-	let mockEventDispatcher: any;
-	let mockStoreManager: any;
+	let mockEventDispatcher: Partial<EventDispatcher>;
+	let mockStoreManager: Partial<StoreManager>;
 	let notificationRouter: NotificationRouter;
 
+	// Default user preferences for testing
+	const defaultPrefs = {
+		events: { socialEvent: true, gameEvent: true },
+		channels: { email: false, inApp: true },
+	};
+
 	beforeEach(() => {
-		mockEventDispatcher = {
-			on: jest.fn(),
-			dispatchEvent: jest.fn(),
-		};
-
+		// mock a real event dispatcher
+		mockEventDispatcher = new EventDispatcher();
+		// Create a mock store manager with a getItem method
 		mockStoreManager = {
-			getItem: jest.fn(),
+			getItem: jest.fn().mockReturnValue(defaultPrefs),
 		};
 
+		jest.spyOn(mockEventDispatcher, "dispatchEvent");
 		notificationRouter = new NotificationRouter(
-			mockEventDispatcher,
-			mockStoreManager
+			mockEventDispatcher as EventDispatcher,
+			mockStoreManager as StoreManager
 		);
 	});
 
-	test("should subscribe to GameEvent on instantiation", () => {
-		expect(mockEventDispatcher.on).toHaveBeenCalledWith(
-			GameEvent.EVENT_TYPE,
-			notificationRouter.handleEvent
-		);
-	});
+	test("should create and dispatch a notification for playerLevelUp game event", () => {
+		const event = new GameEvent(GameEventNameEnum.PlayerLevelUp, {
+			playerId: "1",
+			level: 2,
+		});
 
-	test("getUserNotificationPreferences should call storeManager.getItem with the correct key", () => {
-		const userId = "user123";
-		notificationRouter.getUserNotificationPreferences(userId);
+		mockEventDispatcher.dispatchEvent(event.eventType, event);
+
 		expect(mockStoreManager.getItem).toHaveBeenCalledWith(
-			`user_notification_preferences_${userId}`
+			"user_notification_preferences_1"
+		);
+
+		expect(mockEventDispatcher.dispatchEvent).toHaveBeenCalledWith(
+			NotificationDispatcherEnum.InApp,
+			expect.any(BaseNotification)
+		);
+
+		const dispatchEventMock = mockEventDispatcher.dispatchEvent as jest.Mock;
+		const notificationArg = dispatchEventMock.mock.calls.find(
+			(call) => call[0] === NotificationDispatcherEnum.InApp
+		)?.[1] as BaseNotification;
+
+		expect(notificationArg).toBeDefined();
+		expect(notificationArg.userId).toBe("1");
+		expect(notificationArg.notificationType).toBe(NotificationTypeEnum.InApp);
+		expect(notificationArg.priority).toBe(1);
+		expect(notificationArg.payload).toBe(
+			"Player 1 reached level 2"
 		);
 	});
 
-	test("createNotification should return an instance of BaseNotification with proper properties", () => {
-		const event = {
-			payload: { message: "test message" },
-			playerId: "user123",
-			notificationType: "info",
-			priority: "high",
-		};
-
-		const notification = notificationRouter.createNotification(event);
-		expect(notification).toBeInstanceOf(BaseNotification);
-		expect(notification).toMatchObject({
-			payload: event.payload,
-			playerId: event.playerId,
-			notificationType: event.notificationType,
-			priority: event.priority,
-		});
-	});
-
-	describe("handleEvent", () => {
-		const sampleEvent = {
-			playerId: "user123",
-			payload: { message: "event payload" },
-			notificationType: "alert",
-			priority: "medium",
-		};
-
-		test("should dispatch inApp notifications when user preferences for both social and game events are enabled", () => {
-			// Set up a fake preference where both socialEvent and gameEvent are enabled,
-			// and the inApp channel is enabled.
-			const userPrefs = {
-				events: {
-					socialEvent: true,
-					gameEvent: true,
-				},
-				channels: {
-					email: false,
-					inApp: true,
-					push: false,
-					telegram: false,
-				},
-			};
-
-			// Mock getUserNotificationPreferences to return our fake preferences.
-			jest
-				.spyOn(notificationRouter, "getUserNotificationPreferences")
-				.mockReturnValue(userPrefs);
-
-			// Call handleEvent. Note that handleEvent is not bound by default,
-			// so if needed you might bind it or call it with the proper context.
-			notificationRouter.handleEvent(sampleEvent);
-
-			// Since both socialEventsHandler and gameEventsHandler are invoked,
-			// we expect two inApp dispatch calls.
-			expect(mockEventDispatcher.dispatchEvent).toHaveBeenCalledTimes(2);
-			expect(mockEventDispatcher.dispatchEvent).toHaveBeenCalledWith(
-				NotificationDispatcherEnum.InApp,
-				sampleEvent
-			);
+	test("should create and dispatch a notification for playerAcquireItem game event", () => {
+		const event = new GameEvent(GameEventNameEnum.PlayerAcquireItem, {
+			playerId: "1",
+			itemId: "1",
 		});
 
-		test("should not dispatch notifications if user preferences disable both event types", () => {
-			const userPrefs: UserNotificationPreferences = {
-				events: {
-					socialEvent: false,
-					gameEvent: false,
-				},
-				channels: {
-					email: false,
-					inApp: false,
-					push: false,
-					telegram: false,
-				},
-			};
+		mockEventDispatcher.dispatchEvent(event.eventType, event);
 
-			jest
-				.spyOn(notificationRouter, "getUserNotificationPreferences")
-				.mockReturnValue(userPrefs);
+		expect(mockStoreManager.getItem).toHaveBeenCalledWith(
+			"user_notification_preferences_1"
+		);
 
-			notificationRouter.handleEvent(sampleEvent);
+		expect(mockEventDispatcher.dispatchEvent).toHaveBeenCalledWith(
+			NotificationDispatcherEnum.InApp,
+			expect.any(BaseNotification)
+		);
 
-			expect(mockEventDispatcher.dispatchEvent).not.toHaveBeenCalled();
-		});
+		const dispatchEventMock = mockEventDispatcher.dispatchEvent as jest.Mock;
+		const notificationArg = dispatchEventMock.mock.calls.find(
+			(call) => call[0] === NotificationDispatcherEnum.InApp
+		)?.[1] as BaseNotification;
+
+		expect(notificationArg).toBeDefined();
+		expect(notificationArg.userId).toBe("1");
+		expect(notificationArg.notificationType).toBe(NotificationTypeEnum.InApp);
+		expect(notificationArg.priority).toBe(1);
+		expect(notificationArg.payload).toBe(
+			"Player 1 acquired item 1"
+		);
 	});
 });

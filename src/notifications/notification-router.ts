@@ -1,81 +1,141 @@
-import { NotificationDispatcherEnum } from "../common/enums";
+import {
+	GameEventNameEnum,
+	NotificationDispatcherEnum,
+	NotificationTypeEnum,
+} from "../common/enums";
 import EventDispatcher from "../event-dispatcher/event-dispatcher";
 import { GameEvent } from "../events/game/base/game-event";
 import StoreManager, {
 	UserNotificationPreferences,
 } from "../services/store-manager";
 import BaseNotification from "./base-notification";
+import SocialEvent from "../events/social/base/social-event";
+
 /**
  * @description This class is responsible for routing notifications to the appropriate notification dispatcher
  */
+
 class NotificationRouter {
+	private strategies: NotificationStrategy[] = [];
+
 	constructor(
 		private eventDispatcher: EventDispatcher,
 		private storeManager: StoreManager
 	) {
 		this.eventDispatcher = eventDispatcher;
 		this.storeManager = storeManager;
+		this.initializeStrategies();
 		this.subscribe();
 	}
 
-	getUserNotificationPreferences(userId: string) {
+	private initializeStrategies() {
+		this.strategies.push(
+			new PlayerAcquireItemStrategy(),
+			new PlayerLevelUpStrategy(),
+			new SocialEventStrategy()
+		);
+	}
+
+	private getUserNotificationPreferences(userId: string) {
 		return this.storeManager.getItem(`user_notification_preferences_${userId}`);
 	}
 
-	subscribe() {
-		this.eventDispatcher.on(GameEvent.EVENT_TYPE, this.handleEvent);
-	}
-
-	createNotification(event: Record<string, any>) {
-		const notification = new BaseNotification(event.payload, event.playerId,
-			event.notificationType,
-			event.priority
+	private subscribe() {
+		this.eventDispatcher.on(GameEvent.EVENT_TYPE, (event) =>
+			this.handleEvent(event)
 		);
-		return notification;
 	}
 
-	handleEvent(event: Record<string, any>) {
-		const playerId = event.playerId;
-		const userNotificationPreferences =
-			this.getUserNotificationPreferences(playerId);
-		if (userNotificationPreferences.events.socialEvent) {
-			this.socialEventsHandler(event, userNotificationPreferences);
-		}
-		if (userNotificationPreferences.events.gameEvent) {
-			this.gameEventsHandler(event, userNotificationPreferences);
-		}
-	}
-	socialEventsHandler(
-		message: Record<string, any>,
-		userNotificationPreferences: UserNotificationPreferences
-	) {
-		const playerId = message.playerId;
-		if (userNotificationPreferences.channels.email) {
-			//Route event to email dispatcher
-		}
-		if (userNotificationPreferences.channels.inApp) {
-			this.eventDispatcher.dispatchEvent(
-				NotificationDispatcherEnum.InApp,
-				message
-			);
-		}
-	}
+	private handleEvent(event: GameEvent | SocialEvent) {
+		const playerId = event.eventPayload.playerId;
+		try {
+			const userNotificationPreferences =
+				this.getUserNotificationPreferences(playerId);
 
-	gameEventsHandler(
-		message: Record<string, any>,
-		userNotificationPreferences: UserNotificationPreferences
-	) {
-		const playerId = message.playerId;
-		if (userNotificationPreferences.channels.email) {
-			//Route event to email dispatcher
-		}
-		if (userNotificationPreferences.channels.inApp) {
-			this.eventDispatcher.dispatchEvent(
-				NotificationDispatcherEnum.InApp,
-				message
-			);
+			// Find and apply the appropriate strategy
+			for (const strategy of this.strategies) {
+				if (strategy.shouldProcess(event, userNotificationPreferences)) {
+					const notification = strategy.createNotification(event);
+					this.eventDispatcher.dispatchEvent(
+						NotificationDispatcherEnum.InApp,
+						notification
+					);
+				}
+			}
+		} catch (error) {
+			console.error("Error handling event", error);
 		}
 	}
 }
 
 export default NotificationRouter;
+
+
+interface NotificationStrategy {
+	createNotification(event: any): BaseNotification;
+	shouldProcess(event: any, preferences: UserNotificationPreferences): boolean;
+}
+
+class PlayerAcquireItemStrategy implements NotificationStrategy {
+	createNotification(event: GameEvent): BaseNotification {
+		const playerId = event.eventPayload.playerId;
+		return new BaseNotification(
+			`Player ${playerId} acquired item ${event.eventPayload.itemId}`,
+			playerId,
+			NotificationTypeEnum.InApp,
+			1
+		);
+	}
+
+	shouldProcess(
+		event: GameEvent,
+		preferences: UserNotificationPreferences
+	): boolean {
+		return (
+			event.getEventName() === GameEventNameEnum.PlayerAcquireItem &&
+			preferences.channels.inApp
+		);
+	}
+}
+
+class PlayerLevelUpStrategy implements NotificationStrategy {
+	createNotification(event: GameEvent): BaseNotification {
+		const playerId = event.eventPayload.playerId;
+		return new BaseNotification(
+			`Player ${playerId} reached level ${event.eventPayload.level}`,
+			playerId,
+			NotificationTypeEnum.InApp,
+			1
+		);
+	}
+
+	shouldProcess(
+		event: GameEvent,
+		preferences: UserNotificationPreferences
+	): boolean {
+		return (
+			event.getEventName() === GameEventNameEnum.PlayerLevelUp &&
+			preferences.channels.inApp
+		);
+	}
+}
+
+
+class SocialEventStrategy implements NotificationStrategy {
+	createNotification(event: SocialEvent): BaseNotification {
+		// Create appropriate notification for social events
+		return new BaseNotification(
+			event.eventPayload.message,
+			event.eventPayload.playerId,
+			NotificationTypeEnum.InApp,
+			1
+		);
+	}
+
+	shouldProcess(
+		event: SocialEvent,
+		preferences: UserNotificationPreferences
+	): boolean {
+		return preferences.channels.inApp;
+	}
+}
