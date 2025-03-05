@@ -1,15 +1,16 @@
 import {
-	GameEventNameEnum,
 	NotificationDispatcherEnum,
-	NotificationTypeEnum,
 } from "../common/enums";
 import EventDispatcher from "../event-dispatcher/event-dispatcher";
 import { GameEvent } from "../events/game/base/game-event";
 import StoreManager, {
-	UserNotificationPreferences,
 } from "../services/store-manager";
-import BaseNotification from "./base-notification";
 import SocialEvent from "../events/social/base/social-event";
+import { NotificationStrategy } from "./notification-strategies";
+import { PlayerLevelUpStrategy } from "./notification-strategies";
+import { PlayerAcquireItemStrategy } from "./notification-strategies";
+import { PlayerCompleteQuestStrategy } from "./notification-strategies";
+import { PlayerCompleteAchievementStrategy } from "./notification-strategies";
 
 /**
  * @description This class is responsible for routing notifications to the appropriate notification dispatcher
@@ -31,8 +32,9 @@ class NotificationRouter {
 	private initializeStrategies() {
 		this.strategies.push(
 			new PlayerAcquireItemStrategy(),
-			new PlayerLevelUpStrategy(),
-			new SocialEventStrategy()
+				new PlayerLevelUpStrategy(),
+				new PlayerCompleteQuestStrategy(),
+				new PlayerCompleteAchievementStrategy(),
 		);
 	}
 
@@ -70,72 +72,3 @@ class NotificationRouter {
 
 export default NotificationRouter;
 
-
-interface NotificationStrategy {
-	createNotification(event: any): BaseNotification;
-	shouldProcess(event: any, preferences: UserNotificationPreferences): boolean;
-}
-
-class PlayerAcquireItemStrategy implements NotificationStrategy {
-	createNotification(event: GameEvent): BaseNotification {
-		const playerId = event.eventPayload.playerId;
-		return new BaseNotification(
-			`Player ${playerId} acquired item ${event.eventPayload.itemId}`,
-			playerId,
-			NotificationTypeEnum.InApp,
-			1
-		);
-	}
-
-	shouldProcess(
-		event: GameEvent,
-		preferences: UserNotificationPreferences
-	): boolean {
-		return (
-			event.getEventName() === GameEventNameEnum.PlayerAcquireItem &&
-			preferences.channels.inApp
-		);
-	}
-}
-
-class PlayerLevelUpStrategy implements NotificationStrategy {
-	createNotification(event: GameEvent): BaseNotification {
-		const playerId = event.eventPayload.playerId;
-		return new BaseNotification(
-			`Player ${playerId} reached level ${event.eventPayload.level}`,
-			playerId,
-			NotificationTypeEnum.InApp,
-			1
-		);
-	}
-
-	shouldProcess(
-		event: GameEvent,
-		preferences: UserNotificationPreferences
-	): boolean {
-		return (
-			event.getEventName() === GameEventNameEnum.PlayerLevelUp &&
-			preferences.channels.inApp
-		);
-	}
-}
-
-
-class SocialEventStrategy implements NotificationStrategy {
-	createNotification(event: SocialEvent): BaseNotification {
-		// Create appropriate notification for social events
-		return new BaseNotification(
-			event.eventPayload.message,
-			event.eventPayload.playerId,
-			NotificationTypeEnum.InApp,
-			1
-		);
-	}
-
-	shouldProcess(
-		event: SocialEvent,
-		preferences: UserNotificationPreferences
-	): boolean {
-		return preferences.channels.inApp;
-	}
-}
