@@ -1,11 +1,8 @@
-import {
-	NotificationDispatcherEnum,
-} from "../common/enums";
+import { NotificationDispatcherEnum } from "../common/enums";
 import EventDispatcher from "../event-dispatcher/event-dispatcher";
 import { GameEvent } from "../events/game/base/game-event";
-import StoreManager, {
-} from "../services/store-manager";
-import SocialEvent from "../events/social/base/social-event";
+import StoreManager from "../services/store-manager";
+import { SocialEvent } from "../events/social/base/social-event";
 import { NotificationStrategy } from "./notification-strategies";
 import { PlayerLevelUpStrategy } from "./notification-strategies";
 import { PlayerAcquireItemStrategy } from "./notification-strategies";
@@ -32,9 +29,9 @@ class NotificationRouter {
 	private initializeStrategies() {
 		this.strategies.push(
 			new PlayerAcquireItemStrategy(),
-				new PlayerLevelUpStrategy(),
-				new PlayerCompleteQuestStrategy(),
-				new PlayerCompleteAchievementStrategy(),
+			new PlayerLevelUpStrategy(),
+			new PlayerCompleteQuestStrategy(),
+			new PlayerCompleteAchievementStrategy()
 		);
 	}
 
@@ -54,14 +51,29 @@ class NotificationRouter {
 			const userNotificationPreferences =
 				this.getUserNotificationPreferences(playerId);
 
-			// Find and apply the appropriate strategy
 			for (const strategy of this.strategies) {
 				if (strategy.shouldProcess(event, userNotificationPreferences)) {
 					const notification = strategy.createNotification(event);
-					this.eventDispatcher.dispatchEvent(
-						NotificationDispatcherEnum.InApp,
-						notification
-					);
+
+					// Dispatch to all enabled channels
+					if (userNotificationPreferences.channels.inApp) {
+						this.eventDispatcher.dispatchEvent(
+							NotificationDispatcherEnum.InApp,
+							notification
+						);
+					}
+					if (userNotificationPreferences.channels.email) {
+						this.eventDispatcher.dispatchEvent(
+							NotificationDispatcherEnum.Email,
+							notification
+						);
+					}
+					if (userNotificationPreferences.channels.push) {
+						this.eventDispatcher.dispatchEvent(
+							NotificationDispatcherEnum.Push,
+							notification
+						);
+					}
 				}
 			}
 		} catch (error) {
@@ -71,4 +83,3 @@ class NotificationRouter {
 }
 
 export default NotificationRouter;
-

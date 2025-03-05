@@ -27,7 +27,7 @@ export class PlayerAcquireItemStrategy implements NotificationStrategy {
 	): boolean {
 		return (
 			event.getEventName() === GameEventNameEnum.PlayerAcquireItem &&
-			preferences.channels.inApp
+			(preferences.channels.inApp || preferences.channels.email || preferences.channels.push)
 		);
 	}
 }
@@ -49,7 +49,7 @@ export class PlayerLevelUpStrategy implements NotificationStrategy {
 	): boolean {
 		return (
 			event.getEventName() === GameEventNameEnum.PlayerLevelUp &&
-			preferences.channels.inApp
+			(preferences.channels.inApp || preferences.channels.email || preferences.channels.push)
 		);
 	}
 }
@@ -71,7 +71,7 @@ export class PlayerCompleteQuestStrategy implements NotificationStrategy {
 	): boolean {
 		return (
 			event.getEventName() === GameEventNameEnum.PlayerCompleteQuest &&
-			preferences.channels.inApp
+			(preferences.channels.inApp || preferences.channels.email || preferences.channels.push)
 		);
 	}
 }
@@ -79,7 +79,7 @@ export class PlayerCompleteQuestStrategy implements NotificationStrategy {
 export class PlayerCompleteAchievementStrategy implements NotificationStrategy {
 	createNotification(event: GameEvent): BaseNotification {
 		return new BaseNotification(
-			`Player ${event.eventPayload.playerId} achieved${event.eventPayload.achievementId}`,
+			`Player ${event.eventPayload.playerId} achieved ${event.eventPayload.achievementId}`,
 			event.eventPayload.playerId,
 			NotificationTypeEnum.InApp,
 			1
@@ -90,6 +90,9 @@ export class PlayerCompleteAchievementStrategy implements NotificationStrategy {
 		event: GameEvent,
 		preferences: UserNotificationPreferences
 	): boolean {
-		return preferences.channels.inApp;
+		return (
+			event.getEventName() === GameEventNameEnum.PlayerCompleteAchievement &&
+			(preferences.channels.inApp || preferences.channels.email || preferences.channels.push)
+		);
 	}
 }
