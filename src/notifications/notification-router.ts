@@ -33,28 +33,41 @@ class NotificationRouter {
 	}
 
 	private initializeStrategies() {
-		this.strategies.push(
-			new PlayerAcquireItemStrategy(),
-			new PlayerLevelUpStrategy(),
-			new PlayerCompleteQuestStrategy(),
-			new PlayerCompleteAchievementStrategy(),
-			new FriendRequestStrategy(),
-			new FriendRequestAcceptedStrategy(),
-			new FollowUserStrategy()
-		);
+		try {
+			this.strategies.push(
+				new PlayerAcquireItemStrategy(),
+				new PlayerLevelUpStrategy(),
+				new PlayerCompleteQuestStrategy(),
+				new PlayerCompleteAchievementStrategy(),
+				new FriendRequestStrategy(),
+				new FriendRequestAcceptedStrategy(),
+				new FollowUserStrategy()
+			);
+		} catch (error) {
+			console.error("Error initializing strategies:", error);
+		}
 	}
 
 	private getUserNotificationPreferences(userId: string) {
-		return this.storeManager.getItem(`user.notification.preferences.${userId}`);
+		try {
+			return this.storeManager.getItem(`user.notification.preferences.${userId}`);
+		} catch (error) {
+			console.error("Error retrieving user notification preferences:", error);
+			return null;
+		}
 	}
 
 	private subscribe() {
-		this.eventDispatcher.on(GameEvent.EVENT_TYPE, (event) =>
-			this.handleEvent(event)
-		);
-		this.eventDispatcher.on(SocialEvent.EVENT_TYPE, (event) =>
-			this.handleEvent(event)
-		);
+		try {
+			this.eventDispatcher.on(GameEvent.EVENT_TYPE, (event) =>
+				this.handleEvent(event)
+			);
+			this.eventDispatcher.on(SocialEvent.EVENT_TYPE, (event) =>
+				this.handleEvent(event)
+			);
+		} catch (error) {
+			console.error("Error subscribing to events:", error);
+		}
 	}
 
 	private handleEvent(event: GameEvent | SocialEvent) {
