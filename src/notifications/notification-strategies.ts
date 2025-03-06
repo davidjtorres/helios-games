@@ -1,7 +1,8 @@
-import { GameEventNameEnum } from "../common/enums";
+import { GameEventNameEnum, SocialEventNameEnum } from "../common/enums";
 import { NotificationTypeEnum } from "../common/enums";
 import { GameEvent } from "../events/game/base/game-event";
 import { SocialEvent } from "../events/social/base/social-event";
+import { BaseEvent } from "../events/base/base-event";
 import { UserNotificationPreferences } from "../services/store-manager";
 import BaseNotification from "./base-notification";
 
@@ -22,7 +23,7 @@ export class PlayerAcquireItemStrategy implements NotificationStrategy {
 	}
 
 	shouldProcess(
-		event: GameEvent,
+		event: BaseEvent,
 		preferences: UserNotificationPreferences
 	): boolean {
 		return (
@@ -96,3 +97,67 @@ export class PlayerCompleteAchievementStrategy implements NotificationStrategy {
 		);
 	}
 }
+
+export class FriendRequestStrategy implements NotificationStrategy {
+	createNotification(event: SocialEvent): BaseNotification {
+		return new BaseNotification(
+			`Received a friend request from ${event.eventPayload.playerId}`,
+			event.eventPayload.targetPlayerId,
+			NotificationTypeEnum.InApp,
+			1
+		);
+	}
+
+	shouldProcess(
+		event: SocialEvent,
+		preferences: UserNotificationPreferences
+	): boolean {
+		return (
+			event.getEventName() === SocialEventNameEnum.FriendRequest &&
+			(preferences.channels.inApp || preferences.channels.email || preferences.channels.push)
+		);
+	}
+}
+
+export class FriendRequestAcceptedStrategy implements NotificationStrategy {
+	createNotification(event: SocialEvent): BaseNotification {
+		return new BaseNotification(
+			`Player ${event.eventPayload.targetPlayerId} accepted your friend request`,
+			event.eventPayload.targetPlayerId,
+			NotificationTypeEnum.InApp,
+			1
+		);
+	}
+
+	shouldProcess(
+		event: SocialEvent,
+		preferences: UserNotificationPreferences
+	): boolean {
+		return (
+			event.getEventName() === SocialEventNameEnum.FriendRequestAccepted &&
+			(preferences.channels.inApp || preferences.channels.email || preferences.channels.push)
+		);
+	}
+}
+
+export class FollowUserStrategy implements NotificationStrategy {
+	createNotification(event: SocialEvent): BaseNotification {
+		return new BaseNotification(
+			`Player ${event.eventPayload.playerId} started following you`,
+			event.eventPayload.targetPlayerId,
+			NotificationTypeEnum.InApp,
+			1
+		);
+	}
+
+	shouldProcess(
+		event: SocialEvent,
+		preferences: UserNotificationPreferences
+	): boolean {
+		return (
+			event.getEventName() === SocialEventNameEnum.FollowUser &&
+			(preferences.channels.inApp || preferences.channels.email || preferences.channels.push)
+		);
+	}
+}
+
