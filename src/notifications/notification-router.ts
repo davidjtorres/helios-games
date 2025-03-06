@@ -42,7 +42,7 @@ class NotificationRouter {
 	}
 
 	private getUserNotificationPreferences(userId: string) {
-		return this.storeManager.getItem(`user_notification_preferences_${userId}`);
+		return this.storeManager.getItem(`user.notification.preferences.${userId}`);
 	}
 
 	private subscribe() {
