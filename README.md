@@ -45,7 +45,7 @@ Handles events from the different engines and emits to the subscribers: Notifica
 
 ### Notification Router:
 
-In charge of routing the events to the corresponding notification handler based on the user's notification preferences.
+Selects the right strategy to create a notification based on the event type and routes notifications to the corresponding notification dispatcher based on the user's notification preferences.
 
 ### In-App Notification Dispatcher:
 
