@@ -31,7 +31,7 @@ A player should receive real-time notifications about **social events** when:
 ---
 
 ## Design Overview
-To handle the distribution of notifications, we are using an observable pattern, leveraging Node's EventEmitter class to create an entity that the game engine, social engine, and Notification Router will use to dispatch and subscribe to events. Then in the notifications router, we use a strategy pattern to define how to create notifications based on the event type.
+To handle the distribution of notifications, we are using an observable pattern, leveraging Node's EventEmitter class to create an entity that the game engine, social engine, and Notification Router will use to dispatch and subscribe to events. Then in the notifications router, we use a strategy pattern to define the creation of notifications based on the event type.
 
 ![Diagram](./components-diagram.png)
 
