@@ -1,6 +1,6 @@
+import { GameEventNameEnum } from "../common/enums";
 import EventDispatcher from "../event-dispatcher/event-dispatcher";
-import { PlayerAcquireItemEvent } from "../events/game/player-acquire-item-event";
-import { PlayerLevelUpEvent } from "../events/game/player-level-up-event";
+import { GameEvent } from "../events/game/base/game-event";
 
 class GameEngine {
 	constructor(private eventDispatcher: EventDispatcher) {
@@ -8,18 +8,35 @@ class GameEngine {
 	}
 
 	playerLevelUp(playerId: string, level: number) {
-		const event = new PlayerLevelUpEvent(playerId, 2);
-		this.eventDispatcher.dispatchEvent(
-			PlayerLevelUpEvent.EVENT_TYPE,
-			event.toJSON()
-		);
+		const event = new GameEvent(GameEventNameEnum.PlayerLevelUp, {
+			playerId,
+			level,
+		});
+		this.eventDispatcher.dispatchEvent(GameEvent.EVENT_TYPE, event);
 	}
 	playerAcquireItem(playerId: string, itemId: string) {
-		const event = new PlayerAcquireItemEvent(playerId, itemId);
+		const event = new GameEvent(GameEventNameEnum.PlayerAcquireItem, {
+			playerId,
+			itemId,
+		});
 		this.eventDispatcher.dispatchEvent(
-			PlayerAcquireItemEvent.EVENT_TYPE,
-			event.toJSON()
+			GameEvent.EVENT_TYPE,
+			event
 		);
+	}
+	playerCompleteQuest(playerId: string, questId: string) {
+		const event = new GameEvent(GameEventNameEnum.PlayerCompleteQuest, {
+			playerId,
+			questId,
+		});
+		this.eventDispatcher.dispatchEvent(GameEvent.EVENT_TYPE, event);
+	}
+	playerCompleteAchievement(playerId: string, achievementId: string) {
+		const event = new GameEvent(GameEventNameEnum.PlayerCompleteAchievement, {
+			playerId,
+			achievementId,
+		});
+		this.eventDispatcher.dispatchEvent(GameEvent.EVENT_TYPE, event);
 	}
 }
 
