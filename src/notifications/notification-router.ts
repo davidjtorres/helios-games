@@ -8,6 +8,9 @@ import { PlayerLevelUpStrategy } from "./notification-strategies";
 import { PlayerAcquireItemStrategy } from "./notification-strategies";
 import { PlayerCompleteQuestStrategy } from "./notification-strategies";
 import { PlayerCompleteAchievementStrategy } from "./notification-strategies";
+import { FriendRequestStrategy } from "./notification-strategies";
+import { FriendRequestAcceptedStrategy } from "./notification-strategies";
+import { FollowUserStrategy } from "./notification-strategies";
 
 /**
  * @description This class is responsible for routing notifications to the appropriate notification dispatcher
@@ -31,7 +34,10 @@ class NotificationRouter {
 			new PlayerAcquireItemStrategy(),
 			new PlayerLevelUpStrategy(),
 			new PlayerCompleteQuestStrategy(),
-			new PlayerCompleteAchievementStrategy()
+			new PlayerCompleteAchievementStrategy(),
+			new FriendRequestStrategy(),
+			new FriendRequestAcceptedStrategy(),
+			new FollowUserStrategy()
 		);
 	}
 
@@ -41,6 +47,9 @@ class NotificationRouter {
 
 	private subscribe() {
 		this.eventDispatcher.on(GameEvent.EVENT_TYPE, (event) =>
+			this.handleEvent(event)
+		);
+		this.eventDispatcher.on(SocialEvent.EVENT_TYPE, (event) =>
 			this.handleEvent(event)
 		);
 	}
