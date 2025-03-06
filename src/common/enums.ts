@@ -23,14 +23,9 @@ export enum EventTypeEnum {
 	Game = "game-event",
 }
 
-export enum EventNameEnum {
+export enum SocialEventNameEnum {
 	FollowUser = "followUser",
 	UnfollowUser = "unfollowUser",
 	FriendRequest = "friendRequest",
 	FriendRequestAccepted = "friendRequestAccepted",
-	PlayerLevelUp = "playerLevelUp",
-	PlayerAcquireItem = "playerAcquireItem",
-	PlayerCompleteQuest = "playerCompleteQuest",
-	PlayerCompleteAchievement = "playerCompleteAchievement",
-	PlayerVsPlayer = "playerVsPlayer",
 }
