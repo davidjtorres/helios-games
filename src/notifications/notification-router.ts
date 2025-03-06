@@ -1,4 +1,7 @@
-import { NotificationDispatcherEnum } from "../common/enums";
+import {
+	NotificationDispatcherEnum,
+	NotificationTypeEnum,
+} from "../common/enums";
 import EventDispatcher from "../event-dispatcher/event-dispatcher";
 import { GameEvent } from "../events/game/base/game-event";
 import StoreManager from "../services/store-manager";
@@ -62,22 +65,32 @@ class NotificationRouter {
 
 			for (const strategy of this.strategies) {
 				if (strategy.shouldProcess(event, userNotificationPreferences)) {
-					const notification = strategy.createNotification(event);
-
 					// Dispatch to all enabled channels
 					if (userNotificationPreferences.channels.inApp) {
+						const notification = strategy.createNotification(
+							event,
+							NotificationTypeEnum.InApp
+						);
 						this.eventDispatcher.dispatchEvent(
 							NotificationDispatcherEnum.InApp,
 							notification
 						);
 					}
 					if (userNotificationPreferences.channels.email) {
+						const notification = strategy.createNotification(
+							event,
+							NotificationTypeEnum.Email
+						);
 						this.eventDispatcher.dispatchEvent(
 							NotificationDispatcherEnum.Email,
 							notification
 						);
 					}
 					if (userNotificationPreferences.channels.push) {
+						const notification = strategy.createNotification(
+							event,
+							NotificationTypeEnum.Push
+						);
 						this.eventDispatcher.dispatchEvent(
 							NotificationDispatcherEnum.Push,
 							notification

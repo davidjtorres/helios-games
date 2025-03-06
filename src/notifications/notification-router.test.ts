@@ -5,9 +5,11 @@ import {
 	GameEventNameEnum,
 	NotificationDispatcherEnum,
 	NotificationTypeEnum,
+	SocialEventNameEnum,
 } from "../common/enums";
 import BaseNotification from "./base-notification";
 import { GameEvent } from "../events/game/base/game-event";
+import { SocialEvent } from "../events/social/base/social-event";
 describe("NotificationRouter", () => {
 	let mockEventDispatcher: Partial<EventDispatcher>;
 	let mockStoreManager: Partial<StoreManager>;
@@ -16,7 +18,7 @@ describe("NotificationRouter", () => {
 	// Default user preferences for testing
 	const defaultPrefs = {
 		events: { socialEvent: true, gameEvent: true },
-		channels: { email: false, inApp: true },
+		channels: { email: true, inApp: true, push: true },
 	};
 
 	beforeEach(() => {
@@ -43,7 +45,7 @@ describe("NotificationRouter", () => {
 		mockEventDispatcher.dispatchEvent(event.eventType, event);
 
 		expect(mockStoreManager.getItem).toHaveBeenCalledWith(
-			"user_notification_preferences_1"
+			"user.notification.preferences.1"
 		);
 
 		expect(mockEventDispatcher.dispatchEvent).toHaveBeenCalledWith(
@@ -72,7 +74,7 @@ describe("NotificationRouter", () => {
 		mockEventDispatcher.dispatchEvent(event.eventType, event);
 
 		expect(mockStoreManager.getItem).toHaveBeenCalledWith(
-			"user_notification_preferences_1"
+			"user.notification.preferences.1"
 		);
 
 		expect(mockEventDispatcher.dispatchEvent).toHaveBeenCalledWith(
@@ -101,7 +103,7 @@ describe("NotificationRouter", () => {
 		mockEventDispatcher.dispatchEvent(event.eventType, event);
 
 		expect(mockStoreManager.getItem).toHaveBeenCalledWith(
-			"user_notification_preferences_1"
+			"user.notification.preferences.1"
 		);
 
 		expect(mockEventDispatcher.dispatchEvent).toHaveBeenCalledWith(
@@ -130,7 +132,7 @@ describe("NotificationRouter", () => {
 		mockEventDispatcher.dispatchEvent(event.eventType, event);
 
 		expect(mockStoreManager.getItem).toHaveBeenCalledWith(
-			"user_notification_preferences_1"
+			"user.notification.preferences.1"
 		);
 
 		expect(mockEventDispatcher.dispatchEvent).toHaveBeenCalledWith(
@@ -148,5 +150,101 @@ describe("NotificationRouter", () => {
 		expect(notificationArg.notificationType).toBe(NotificationTypeEnum.InApp);
 		expect(notificationArg.priority).toBe(1);
 		expect(notificationArg.payload).toBe("Player 1 achieved 1");
+	});
+
+	test("should create and dispatch a notification for friendRequest game event", () => {
+		const event = new SocialEvent(SocialEventNameEnum.FriendRequest, {
+			playerId: "1",
+			targetPlayerId: "2",
+			gameId: "1",
+		});
+
+		mockEventDispatcher.dispatchEvent(event.eventType, event);
+
+		expect(mockStoreManager.getItem).toHaveBeenCalledWith(
+			"user.notification.preferences.1"
+		);
+
+		expect(mockEventDispatcher.dispatchEvent).toHaveBeenCalledWith(
+			NotificationDispatcherEnum.InApp,
+			expect.any(BaseNotification)
+		);
+
+		const dispatchEventMock = mockEventDispatcher.dispatchEvent as jest.Mock;
+		const notificationArg = dispatchEventMock.mock.calls.find(
+			(call) => call[0] === NotificationDispatcherEnum.InApp
+		)?.[1] as BaseNotification;
+
+		expect(notificationArg).toBeDefined();
+		expect(notificationArg.userId).toBe("2");
+		expect(notificationArg.notificationType).toBe(NotificationTypeEnum.InApp);
+		expect(notificationArg.priority).toBe(1);
+		expect(notificationArg.payload).toBe(
+			"Received a friend request from Player 1"
+		);
+	});
+
+	test("should create and dispatch a notification for friendRequestAccepted game event", () => {
+		const event = new SocialEvent(SocialEventNameEnum.FriendRequestAccepted, {
+			playerId: "1",
+			targetPlayerId: "2",
+			gameId: "1",
+		});
+
+		mockEventDispatcher.dispatchEvent(event.eventType, event);
+
+		expect(mockStoreManager.getItem).toHaveBeenCalledWith(
+			"user.notification.preferences.1"
+		);
+
+		expect(mockEventDispatcher.dispatchEvent).toHaveBeenCalledWith(
+			NotificationDispatcherEnum.InApp,
+			expect.any(BaseNotification)
+		);
+
+		const dispatchEventMock = mockEventDispatcher.dispatchEvent as jest.Mock;
+		const notificationArg = dispatchEventMock.mock.calls.find(
+			(call) => call[0] === NotificationDispatcherEnum.InApp
+		)?.[1] as BaseNotification;
+
+		expect(notificationArg).toBeDefined();
+		expect(notificationArg.userId).toBe("2");
+		expect(notificationArg.notificationType).toBe(NotificationTypeEnum.InApp);
+		expect(notificationArg.priority).toBe(1);
+		expect(notificationArg.payload).toBe(
+			"Player 2 accepted your friend request"
+		);
+	});
+
+	test("should create and dispatch a notification for followUser game event", () => {
+		const event = new SocialEvent(SocialEventNameEnum.FollowUser, {
+			playerId: "1",
+			targetPlayerId: "2",
+			gameId: "1",
+		});
+
+		mockEventDispatcher.dispatchEvent(event.eventType, event);
+
+		expect(mockStoreManager.getItem).toHaveBeenCalledWith(
+			"user.notification.preferences.1"
+		);
+
+		expect(mockEventDispatcher.dispatchEvent).toHaveBeenCalledWith(
+			NotificationDispatcherEnum.InApp,
+			expect.any(BaseNotification)
+		);
+
+		const dispatchEventMock = mockEventDispatcher.dispatchEvent as jest.Mock;
+		const notificationArg = dispatchEventMock.mock.calls.find(
+			(call) => call[0] === NotificationDispatcherEnum.InApp
+		)?.[1] as BaseNotification;
+
+		expect(notificationArg).toBeDefined();
+		expect(notificationArg.userId).toBe("2");
+		expect(notificationArg.notificationType).toBe(NotificationTypeEnum.InApp);
+		expect(notificationArg.priority).toBe(1);
+		expect(notificationArg.payload).toBe(
+			"Player 1 started following you"
+		);
 	});
 });
